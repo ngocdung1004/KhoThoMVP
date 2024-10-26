@@ -35,6 +35,18 @@ namespace KhoThoMVP
             builder.Services.AddScoped<IJobTypeService, JobTypeService>();
             builder.Services.AddScoped<IWorkerJobTypeService, WorkerJobTypeService>();
 
+
+            // Thêm dịch vụ CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder => builder
+                        .AllowAnyOrigin()  // Cho phép tất cả các nguồn gốc
+                        .AllowAnyMethod()  // Cho phép tất cả các phương thức (GET, POST, PUT, DELETE, v.v.)
+                        .AllowAnyHeader()); // Cho phép tất cả các header
+            });
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -43,6 +55,7 @@ namespace KhoThoMVP
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseCors("AllowAllOrigins");
 
             app.UseHttpsRedirection();
 
