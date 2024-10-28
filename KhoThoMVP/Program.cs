@@ -1,9 +1,11 @@
-﻿
-using KhoThoMVP.Interfaces;
+﻿using KhoThoMVP.Interfaces;
 using KhoThoMVP.Mappers;
 using KhoThoMVP.Models;
 using KhoThoMVP.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace KhoThoMVP
 {
@@ -46,6 +48,21 @@ namespace KhoThoMVP
                         .AllowAnyHeader()); // Cho phép tất cả các header
             });
 
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    };
+                });
 
             var app = builder.Build();
 
@@ -58,7 +75,7 @@ namespace KhoThoMVP
             app.UseCors("AllowAllOrigins");
 
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
