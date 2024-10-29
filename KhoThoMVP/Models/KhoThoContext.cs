@@ -30,6 +30,7 @@ public partial class KhoThoContext : DbContext
     public virtual DbSet<Worker> Workers { get; set; }
 
     public virtual DbSet<WorkerJobType> WorkerJobTypes { get; set; }
+    public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -183,6 +184,25 @@ public partial class KhoThoContext : DbContext
                 .HasForeignKey(d => d.WorkerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__WorkerJob__Worke__10566F31");
+        });
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.HasKey(e => e.TokenId).HasName("PK__Password__658FEEAC");
+
+            entity.Property(e => e.TokenId).HasColumnName("TokenID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+            entity.Property(e => e.Token).HasMaxLength(6).IsRequired();
+            entity.Property(e => e.ExpiryDate).HasColumnType("datetime");
+            entity.Property(e => e.IsUsed).HasDefaultValue(false);
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__PasswordR__UserI");
         });
 
         OnModelCreatingPartial(modelBuilder);
