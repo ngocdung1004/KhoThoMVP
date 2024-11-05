@@ -37,10 +37,17 @@ namespace KhoThoMVP.Controllers
             }
         }
 
+        //[HttpPost]
+        //public async Task<ActionResult<WorkerDto>> CreateWorker(WorkerDto workerDto)
+        //{
+        //    var createdWorker = await _workerService.CreateWorkerAsync(workerDto);
+        //    return CreatedAtAction(nameof(GetWorker), new { id = createdWorker.WorkerId }, createdWorker);
+        //}
+
         [HttpPost]
-        public async Task<ActionResult<WorkerDto>> CreateWorker(WorkerDto workerDto)
+        public async Task<ActionResult<WorkerDto>> CreateWorker(CreateWorkerDto createWorkerDto)
         {
-            var createdWorker = await _workerService.CreateWorkerAsync(workerDto);
+            var createdWorker = await _workerService.CreateWorkerAsync(createWorkerDto);
             return CreatedAtAction(nameof(GetWorker), new { id = createdWorker.WorkerId }, createdWorker);
         }
 

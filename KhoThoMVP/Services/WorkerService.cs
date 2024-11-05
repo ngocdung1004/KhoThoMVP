@@ -43,26 +43,93 @@ namespace KhoThoMVP.Services
 
             return _mapper.Map<WorkerDto>(worker);
         }
-
-        public async Task<WorkerDto> UpdateWorkerAsync(int id, WorkerDto workerDto)
+        public async Task<WorkerDto> CreateWorkerAsync(CreateWorkerDto createWorkerDto)
         {
-            var worker = await _context.Workers.FindAsync(id);
-            if (worker == null)
-                throw new KeyNotFoundException($"Worker with ID {id} not found");
+            var workerDto = new WorkerDto
+            {
+                UserId = createWorkerDto.UserId,
+                ExperienceYears = createWorkerDto.ExperienceYears,
+                Rating = createWorkerDto.Rating,
+                Bio = createWorkerDto.Bio,
+                Verified = createWorkerDto.Verified
+            };
 
-            _mapper.Map(workerDto, worker);
+            var worker = _mapper.Map<Worker>(workerDto);
+            _context.Workers.Add(worker);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<WorkerDto>(worker);
         }
 
-        public async Task DeleteWorkerAsync(int id)
+        //public async Task<WorkerDto> UpdateWorkerAsync(int id, WorkerDto workerDto)
+        //{
+        //    var worker = await _context.Workers.FindAsync(id);
+        //    if (worker == null)
+        //        throw new KeyNotFoundException($"Worker with ID {id} not found");
+
+        //    _mapper.Map(workerDto, worker);
+        //    await _context.SaveChangesAsync();
+
+        //    return _mapper.Map<WorkerDto>(worker);
+        //}
+
+        public async Task<WorkerDto> UpdateWorkerAsync(int id, WorkerDto workerDto)
         {
-            var worker = await _context.Workers.FindAsync(id);
+            var worker = await _context.Workers
+                .Include(w => w.User)  // Include User để tránh mất data khi map
+                .FirstOrDefaultAsync(w => w.WorkerId == id);
+
             if (worker == null)
                 throw new KeyNotFoundException($"Worker with ID {id} not found");
 
+            // Chỉ cập nhật các thuộc tính của Worker
+            worker.ExperienceYears = workerDto.ExperienceYears;
+            worker.Rating = workerDto.Rating;
+            worker.Bio = workerDto.Bio;
+            worker.Verified = workerDto.Verified;
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<WorkerDto>(worker);
+        }
+
+        //public async Task DeleteWorkerAsync(int id)
+        //{
+        //    var worker = await _context.Workers.FindAsync(id);
+        //    if (worker == null)
+        //        throw new KeyNotFoundException($"Worker with ID {id} not found");
+
+        //    _context.Workers.Remove(worker);
+        //    await _context.SaveChangesAsync();
+        //}
+        public async Task DeleteWorkerAsync(int id)
+        {
+            var worker = await _context.Workers
+                .Include(w => w.WorkerJobTypes)
+                .Include(w => w.Subscriptions)
+                .Include(w => w.Reviews)
+                .Include(w => w.Payments)
+                .FirstOrDefaultAsync(w => w.WorkerId == id);
+
+            if (worker == null)
+                throw new KeyNotFoundException($"Worker with ID {id} not found");
+
+            // Remove related records first
+            if (worker.WorkerJobTypes != null)
+                _context.WorkerJobTypes.RemoveRange(worker.WorkerJobTypes);
+
+            if (worker.Subscriptions != null)
+                _context.Subscriptions.RemoveRange(worker.Subscriptions);
+
+            if (worker.Reviews != null)
+                _context.Reviews.RemoveRange(worker.Reviews);
+
+            if (worker.Payments != null)
+                _context.Payments.RemoveRange(worker.Payments);
+
+            // Finally remove the worker
             _context.Workers.Remove(worker);
+
             await _context.SaveChangesAsync();
         }
 
