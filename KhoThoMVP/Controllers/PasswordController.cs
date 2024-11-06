@@ -109,12 +109,12 @@ namespace KhoThoMVP.Controllers
                 return BadRequest(new { message = "Invalid request" });
 
             var passwordResetToken = await _context.PasswordResetTokens
-                .Where(t => t.UserId == user.UserId &&
-                           t.Token == request.OTP &&
-                           !t.IsUsed &&
-                           t.ExpiryDate > DateTime.UtcNow)
-                .OrderByDescending(t => t.CreatedAt)
-                .FirstOrDefaultAsync();
+    .Where(t => t.UserId == user.UserId &&
+               t.Token == request.OTP &&
+               t.IsUsed == false && // Ensure t.IsUsed is explicitly compared to false
+               t.ExpiryDate > DateTime.UtcNow)
+    .OrderByDescending(t => t.CreatedAt)
+    .FirstOrDefaultAsync();
 
             if (passwordResetToken == null)
                 return BadRequest(new { message = "Invalid or expired OTP" });
