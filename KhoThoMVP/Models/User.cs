@@ -23,6 +23,12 @@ public partial class User
 
     public DateTime? CreatedAt { get; set; }
 
+    public virtual ICollection<BookingCancellation> BookingCancellations { get; set; } = new List<BookingCancellation>();
+
+    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
+    public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
+
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
     public virtual Worker? Worker { get; set; }
