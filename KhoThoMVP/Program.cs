@@ -37,6 +37,8 @@ namespace KhoThoMVP
             builder.Services.AddScoped<IJobTypeService, JobTypeService>();
             builder.Services.AddScoped<IWorkerJobTypeService, WorkerJobTypeService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddScoped<IWorkerScheduleService, WorkerScheduleService>();
 
 
             // Thêm dịch vụ CORS
