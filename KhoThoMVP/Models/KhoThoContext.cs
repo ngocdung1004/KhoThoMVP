@@ -17,7 +17,15 @@ public partial class KhoThoContext : DbContext
 
     public virtual DbSet<Admin> Admins { get; set; }
 
+    public virtual DbSet<Booking> Bookings { get; set; }
+
+    public virtual DbSet<BookingCancellation> BookingCancellations { get; set; }
+
+    public virtual DbSet<BookingPayment> BookingPayments { get; set; }
+
     public virtual DbSet<JobType> JobTypes { get; set; }
+
+    public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
     public virtual DbSet<Payment> Payments { get; set; }
 
@@ -30,23 +38,14 @@ public partial class KhoThoContext : DbContext
     public virtual DbSet<Worker> Workers { get; set; }
 
     public virtual DbSet<WorkerJobType> WorkerJobTypes { get; set; }
-    public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
+    public virtual DbSet<WorkerRate> WorkerRates { get; set; }
+
+    public virtual DbSet<WorkerSchedule> WorkerSchedules { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer(GetConnectionString());
-    }
-    private string GetConnectionString()
-    {
-        IConfiguration config = new ConfigurationBuilder()
-             .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", true, true)
-                    .Build();
-        var strConn = config["ConnectionStrings:DefaultConnection"];
-
-        return strConn;
-    }
-
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=DESKTOP-SVMK9VQ;Initial Catalog=dungnn_exe101_thodung5;Integrated Security=True;Encrypt=True;Trust Server Certificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -68,6 +67,89 @@ public partial class KhoThoContext : DbContext
             entity.Property(e => e.Username).HasMaxLength(255);
         });
 
+        modelBuilder.Entity<Booking>(entity =>
+        {
+            entity.HasKey(e => e.BookingId).HasName("PK__Bookings__73951ACD8093FDC6");
+
+            entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
+            entity.Property(e => e.HourlyRate).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.JobTypeId).HasColumnName("JobTypeID");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending");
+            entity.Property(e => e.TotalAmount).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.TotalHours).HasColumnType("decimal(4, 2)");
+            entity.Property(e => e.WorkerId).HasColumnName("WorkerID");
+
+            entity.HasOne(d => d.Customer).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.CustomerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Bookings__Custom__42E1EEFE");
+
+            entity.HasOne(d => d.JobType).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.JobTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Bookings__JobTyp__44CA3770");
+
+            entity.HasOne(d => d.Worker).WithMany(p => p.Bookings)
+                .HasForeignKey(d => d.WorkerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Bookings__Worker__43D61337");
+        });
+
+        modelBuilder.Entity<BookingCancellation>(entity =>
+        {
+            entity.HasKey(e => e.CancellationId).HasName("PK__BookingC__6A2D9A1A0AFEDB4D");
+
+            entity.Property(e => e.CancellationId).HasColumnName("CancellationID");
+            entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.CancelledAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.RefundAmount).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.RefundStatus)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending");
+
+            entity.HasOne(d => d.Booking).WithMany(p => p.BookingCancellations)
+                .HasForeignKey(d => d.BookingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__BookingCa__Booki__531856C7");
+
+            entity.HasOne(d => d.CancelledByNavigation).WithMany(p => p.BookingCancellations)
+                .HasForeignKey(d => d.CancelledBy)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__BookingCa__Cance__540C7B00");
+        });
+
+        modelBuilder.Entity<BookingPayment>(entity =>
+        {
+            entity.HasKey(e => e.BookingPaymentId).HasName("PK__BookingP__B9EFED93E61C24F7");
+
+            entity.Property(e => e.BookingPaymentId).HasColumnName("BookingPaymentID");
+            entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+            entity.Property(e => e.PaymentStatus)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending");
+            entity.Property(e => e.PaymentTime)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.TransactionId)
+                .HasMaxLength(255)
+                .HasColumnName("TransactionID");
+
+            entity.HasOne(d => d.Booking).WithMany(p => p.BookingPayments)
+                .HasForeignKey(d => d.BookingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__BookingPa__Booki__4E53A1AA");
+        });
+
         modelBuilder.Entity<JobType>(entity =>
         {
             entity.HasKey(e => e.JobTypeId).HasName("PK__JobTypes__E1F4624DC96E0940");
@@ -76,6 +158,25 @@ public partial class KhoThoContext : DbContext
 
             entity.Property(e => e.JobTypeId).HasColumnName("JobTypeID");
             entity.Property(e => e.JobTypeName).HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.HasKey(e => e.TokenId).HasName("PK__Password__658FEE8A4A8F8131");
+
+            entity.Property(e => e.TokenId).HasColumnName("TokenID");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ExpiryDate).HasColumnType("datetime");
+            entity.Property(e => e.IsUsed).HasDefaultValue(false);
+            entity.Property(e => e.Token).HasMaxLength(6);
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PasswordResetTokens)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__PasswordR__UserI__2B0A656D");
         });
 
         modelBuilder.Entity<Payment>(entity =>
@@ -197,24 +298,43 @@ public partial class KhoThoContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__WorkerJob__Worke__10566F31");
         });
-        modelBuilder.Entity<PasswordResetToken>(entity =>
+
+        modelBuilder.Entity<WorkerRate>(entity =>
         {
-            entity.HasKey(e => e.TokenId).HasName("PK__Password__658FEEAC");
+            entity.HasKey(e => e.RateId).HasName("PK__WorkerRa__58A7CCBCF1E67356");
 
-            entity.Property(e => e.TokenId).HasColumnName("TokenID");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
-            entity.Property(e => e.Token).HasMaxLength(6).IsRequired();
-            entity.Property(e => e.ExpiryDate).HasColumnType("datetime");
-            entity.Property(e => e.IsUsed).HasDefaultValue(false);
-            entity.Property(e => e.CreatedAt)
-                .HasColumnType("datetime")
-                .HasDefaultValueSql("(getdate())");
+            entity.HasIndex(e => new { e.WorkerId, e.JobTypeId }, "UC_WorkerRate").IsUnique();
 
-            entity.HasOne(d => d.User)
-                .WithMany()
-                .HasForeignKey(d => d.UserId)
+            entity.Property(e => e.RateId).HasColumnName("RateID");
+            entity.Property(e => e.HourlyRate).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.JobTypeId).HasColumnName("JobTypeID");
+            entity.Property(e => e.WorkerId).HasColumnName("WorkerID");
+
+            entity.HasOne(d => d.JobType).WithMany(p => p.WorkerRates)
+                .HasForeignKey(d => d.JobTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PasswordR__UserI");
+                .HasConstraintName("FK__WorkerRat__JobTy__498EEC8D");
+
+            entity.HasOne(d => d.Worker).WithMany(p => p.WorkerRates)
+                .HasForeignKey(d => d.WorkerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__WorkerRat__Worke__489AC854");
+        });
+
+        modelBuilder.Entity<WorkerSchedule>(entity =>
+        {
+            entity.HasKey(e => e.ScheduleId).HasName("PK__WorkerSc__9C8A5B699517048F");
+
+            entity.HasIndex(e => new { e.WorkerId, e.DayOfWeek }, "UC_WorkerSchedule").IsUnique();
+
+            entity.Property(e => e.ScheduleId).HasColumnName("ScheduleID");
+            entity.Property(e => e.IsAvailable).HasDefaultValue(true);
+            entity.Property(e => e.WorkerId).HasColumnName("WorkerID");
+
+            entity.HasOne(d => d.Worker).WithMany(p => p.WorkerSchedules)
+                .HasForeignKey(d => d.WorkerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__WorkerSch__Worke__3E1D39E1");
         });
 
         OnModelCreatingPartial(modelBuilder);

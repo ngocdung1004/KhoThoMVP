@@ -17,6 +17,8 @@ public partial class Worker
 
     public bool? Verified { get; set; }
 
+    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
@@ -26,4 +28,8 @@ public partial class Worker
     public virtual User User { get; set; } = null!;
 
     public virtual ICollection<WorkerJobType> WorkerJobTypes { get; set; } = new List<WorkerJobType>();
+
+    public virtual ICollection<WorkerRate> WorkerRates { get; set; } = new List<WorkerRate>();
+
+    public virtual ICollection<WorkerSchedule> WorkerSchedules { get; set; } = new List<WorkerSchedule>();
 }
