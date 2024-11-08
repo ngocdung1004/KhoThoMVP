@@ -107,7 +107,7 @@ namespace KhoThoMVP.Controllers
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Name, user.FullName),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim("UserType", user.UserType.ToString())
+            new Claim(ClaimTypes.Role, user.UserType.ToString())
         };
 
             var token = new JwtSecurityToken(
