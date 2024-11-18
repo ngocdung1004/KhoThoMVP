@@ -1,5 +1,6 @@
 ﻿using KhoThoMVP.DTOs;
 using KhoThoMVP.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,14 +16,14 @@ namespace KhoThoMVP.Controllers
         {
             _paymentService = paymentService;
         }
-
+        [Authorize(Roles = "0")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentDto>>> GetAllPayments()
         {
             var payments = await _paymentService.GetAllPaymentsAsync();
             return Ok(payments);
         }
-
+        [Authorize(Roles = "0, 1, 2")]
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentDto>> GetPayment(int id)
         {
@@ -30,21 +31,21 @@ namespace KhoThoMVP.Controllers
             if (payment == null) return NotFound();
             return Ok(payment);
         }
-
+        [Authorize(Roles = "0")]
         [HttpGet("worker/{workerId}")]
         public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPaymentsByWorkerId(int workerId)
         {
             var payments = await _paymentService.GetPaymentsByWorkerIdAsync(workerId);
             return Ok(payments);
         }
-
+        [Authorize(Roles = "0, 1, 2")]
         [HttpPost]
         public async Task<ActionResult<PaymentDto>> CreatePayment(PaymentDto paymentDto)
         {
             var payment = await _paymentService.CreatePaymentAsync(paymentDto);
             return CreatedAtAction(nameof(GetPayment), new { id = payment.PaymentId }, payment);
         }
-
+        [Authorize(Roles = "0, 1, 2")]
         [HttpPut("{id}")]
         public async Task<ActionResult<PaymentDto>> UpdatePayment(int id, PaymentDto paymentDto)
         {
@@ -52,7 +53,7 @@ namespace KhoThoMVP.Controllers
             if (payment == null) return NotFound();
             return Ok(payment);
         }
-
+        [Authorize(Roles = "0")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePayment(int id)
         {
