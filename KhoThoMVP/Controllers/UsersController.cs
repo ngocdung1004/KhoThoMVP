@@ -3,6 +3,7 @@ using KhoThoMVP.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KhoThoMVP.Controllers
 {
@@ -82,6 +83,28 @@ namespace KhoThoMVP.Controllers
             try
             {
                 var user = await _userService.GetUserByEmailAsync(email);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<ActionResult<UserDto>> GetCurrentUser()
+        {
+            try
+            {
+                // Lấy email từ claim của token
+                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest("User email not found in token");
+                }
+
+                var user = await _userService.GetUserByEmailAsync(userEmail);
                 return Ok(user);
             }
             catch (KeyNotFoundException ex)
