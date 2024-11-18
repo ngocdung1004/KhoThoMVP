@@ -1,5 +1,6 @@
 ﻿using KhoThoMVP.DTOs;
 using KhoThoMVP.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,14 +16,14 @@ namespace KhoThoMVP.Controllers
         {
             _workerService = workerService;
         }
-
+        [Authorize(Roles = "0, 1, 2")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WorkerDto>>> GetWorkers()
         {
             var workers = await _workerService.GetAllWorkersAsync();
             return Ok(workers);
         }
-
+        [Authorize(Roles = "0, 1, 2")]
         [HttpGet("{id}")]
         public async Task<ActionResult<WorkerDto>> GetWorker(int id)
         {
@@ -43,14 +44,14 @@ namespace KhoThoMVP.Controllers
         //    var createdWorker = await _workerService.CreateWorkerAsync(workerDto);
         //    return CreatedAtAction(nameof(GetWorker), new { id = createdWorker.WorkerId }, createdWorker);
         //}
-
+        [Authorize(Roles = "0, 1")]
         [HttpPost]
         public async Task<ActionResult<WorkerDto>> CreateWorker(CreateWorkerDto createWorkerDto)
         {
             var createdWorker = await _workerService.CreateWorkerAsync(createWorkerDto);
             return CreatedAtAction(nameof(GetWorker), new { id = createdWorker.WorkerId }, createdWorker);
         }
-
+        [Authorize(Roles = "0, 2")]
         [HttpPut("{id}")]
         public async Task<ActionResult<WorkerDto>> UpdateWorker(int id, WorkerDto workerDto)
         {
@@ -64,7 +65,7 @@ namespace KhoThoMVP.Controllers
                 return NotFound(ex.Message);
             }
         }
-
+        [Authorize(Roles = "0")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWorker(int id)
         {
@@ -78,7 +79,7 @@ namespace KhoThoMVP.Controllers
                 return NotFound(ex.Message);
             }
         }
-
+        [Authorize(Roles = "0, 1, 2")]
         [HttpGet("jobtype/{jobTypeId}")]
         public async Task<ActionResult<IEnumerable<WorkerDto>>> GetWorkersByJobType(int jobTypeId)
         {

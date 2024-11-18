@@ -47,7 +47,7 @@ namespace KhoThoMVP.Controllers
             var createdUser = await _userService.CreateUserAsync(userDto);
             return CreatedAtAction(nameof(GetUser), new { id = createdUser.UserId }, createdUser);
         }
-        [Authorize(Roles = "0")]
+        [Authorize(Roles = "0,1,2")]
         [HttpPut("{id}")]
         public async Task<ActionResult<UserDto>> UpdateUser(int id, UserDto userDto)
         {
