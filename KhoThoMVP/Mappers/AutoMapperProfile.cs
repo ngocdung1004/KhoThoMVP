@@ -52,6 +52,15 @@ namespace KhoThoMVP.Mappers
             .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.EndTime))  // Directly map TimeOnly to TimeOnly
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now));  // Set CreatedAt to current datetime
 
+
+            CreateMap<CreateWorkerDto, Worker>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.ExperienceYears, opt => opt.MapFrom(src => src.ExperienceYears))
+                .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Rating ?? 0))
+                .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => src.Bio ?? string.Empty))
+                .ForMember(dest => dest.Verified, opt => opt.MapFrom(src => src.Verified ?? false))
+                .ForMember(dest => dest.WorkerJobTypes, opt => opt.Ignore());
+
             CreateMap<WorkerRate, WorkerRateDto>().ReverseMap(); 
             CreateMap<CreateWorkerRateDto, WorkerRate>().ReverseMap(); 
 
