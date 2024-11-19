@@ -119,16 +119,25 @@ namespace KhoThoMVP.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // Kiểm tra và lấy WorkerRate trước
+                var workerRate = await _context.WorkerRates
+    .FirstOrDefaultAsync(r => r.WorkerId == dto.WorkerID && r.JobTypeId == dto.JobTypeID);
+
+                if (workerRate == null && dto.HourlyRate <= 0)
+                {
+                    throw new InvalidOperationException("Worker rate not found for this job type.");
+                }
+
                 var booking = _mapper.Map<Booking>(dto);
 
                 // Tính toán tổng số giờ
                 var duration = dto.EndTime - dto.StartTime;
                 booking.TotalHours = (decimal)duration.TotalHours;
 
-                // Lấy thông tin hourly rate của worker
-                var workerRate = await _context.WorkerRates
-                    .FirstOrDefaultAsync(r => r.WorkerId == dto.WorkerID && r.JobTypeId == dto.JobTypeID);
-                booking.HourlyRate = workerRate?.HourlyRate ?? 0;
+                // Gán hourly rate từ WorkerRate hoặc từ dto
+                booking.HourlyRate = workerRate?.HourlyRate ?? dto.HourlyRate;
+
+                // Tính tổng tiền
                 booking.TotalAmount = booking.TotalHours * booking.HourlyRate;
 
                 // Thêm booking vào cơ sở dữ liệu
@@ -139,16 +148,16 @@ namespace KhoThoMVP.Services
                 var workerSchedule = new WorkerSchedule
                 {
                     WorkerId = dto.WorkerID,
-                    DayOfWeek = (int)dto.BookingDate.DayOfWeek,  // Chuyển đổi ngày sang số thứ tự (0-6)
+                    DayOfWeek = (int)dto.BookingDate.DayOfWeek,
                     StartTime = dto.StartTime,
                     EndTime = dto.EndTime,
-                    IsAvailable = false // Worker không còn khả dụng trong khoảng thời gian này
+                    IsAvailable = false
                 };
 
                 _context.WorkerSchedules.Add(workerSchedule);
                 await _context.SaveChangesAsync();
-
                 await transaction.CommitAsync();
+
                 return _mapper.Map<BookingDto>(booking);
             }
             catch (Exception)
