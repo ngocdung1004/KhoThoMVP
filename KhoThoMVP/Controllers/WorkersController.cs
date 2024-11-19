@@ -3,6 +3,7 @@ using KhoThoMVP.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KhoThoMVP.Controllers
 {
@@ -85,6 +86,27 @@ namespace KhoThoMVP.Controllers
         {
             var workers = await _workerService.GetWorkersByJobTypeAsync(jobTypeId);
             return Ok(workers);
+        }
+
+        [Authorize(Roles = "0, 1, 2")]
+        [HttpGet("me")]
+        public async Task<ActionResult<WorkerDto>> GetCurrentWorker()
+        {
+            try
+            {
+                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest("User email not found in token");
+                }
+
+                var worker = await _workerService.GetWorkerByEmailAsync(userEmail);
+                return Ok(worker);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

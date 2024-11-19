@@ -203,5 +203,36 @@ namespace KhoThoMVP.Services
 
             return _mapper.Map<IEnumerable<WorkerDto>>(workers);
         }
+
+
+        public async Task<WorkerDto> GetWorkerByEmailAsync(string email)
+        {
+            var worker = await _context.Workers
+                .Include(w => w.User)
+                .FirstOrDefaultAsync(w => w.User.Email == email);
+
+            if (worker == null)
+                throw new KeyNotFoundException($"Worker with email {email} not found");
+
+            return new WorkerDto
+            {
+                WorkerId = worker.WorkerId,
+                UserId = worker.UserId,
+                ExperienceYears = worker.ExperienceYears,
+                Rating = (float?)worker.Rating,
+                Bio = worker.Bio,
+                Verified = worker.Verified,
+                User = new UserDto
+                {
+                    UserId = worker.User.UserId,
+                    Email = worker.User.Email,
+                    FullName = worker.User.FullName,
+                    PhoneNumber = worker.User.PhoneNumber,
+                    ProfilePicture = worker.User.ProfilePicture,
+                    UserType = worker.User.UserType,
+                    // Add other user properties as needed
+                }
+            };
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace KhoThoMVP.Controllers
         {
             _bookingService = bookingService;
         }
-        [Authorize(Roles = "0")]
+        [Authorize(Roles = "0,1,2")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookingDto>>> GetAll()
         {
@@ -45,7 +45,7 @@ namespace KhoThoMVP.Controllers
             var bookings = await _bookingService.GetBookingsByWorkerIdAsync(workerId);
             return Ok(bookings);
         }
-        [Authorize(Roles = "0, 1")]
+        [Authorize(Roles = "0, 1, 2")]
         [HttpPost]
         public async Task<ActionResult<BookingDto>> Create(CreateBookingDto dto)
         {
