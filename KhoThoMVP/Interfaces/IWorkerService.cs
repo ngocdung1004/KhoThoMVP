@@ -10,5 +10,6 @@ namespace KhoThoMVP.Interfaces
         Task<WorkerDto> UpdateWorkerAsync(int id, WorkerDto workerDto);
         Task DeleteWorkerAsync(int id);
         Task<IEnumerable<WorkerDto>> GetWorkersByJobTypeAsync(int jobTypeId);
+        Task<WorkerDto> GetWorkerByEmailAsync(string email);
     }
 }
