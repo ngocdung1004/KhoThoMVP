@@ -76,7 +76,7 @@ namespace KhoThoMVP.Controllers
                 return NotFound(ex.Message);
             }
         }
-        [Authorize(Roles = "0")]
+        //[Authorize(Roles = "0")]
         [HttpGet("email/{email}")]
         public async Task<ActionResult<UserDto>> GetUserByEmail(string email)
         {
