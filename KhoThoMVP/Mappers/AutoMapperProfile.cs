@@ -54,12 +54,15 @@ namespace KhoThoMVP.Mappers
 
 
             CreateMap<CreateWorkerDto, Worker>()
-                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.ExperienceYears, opt => opt.MapFrom(src => src.ExperienceYears))
-                .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Rating ?? 0))
-                .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => src.Bio ?? string.Empty))
-                .ForMember(dest => dest.Verified, opt => opt.MapFrom(src => src.Verified ?? false))
-                .ForMember(dest => dest.WorkerJobTypes, opt => opt.Ignore());
+    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+    .ForMember(dest => dest.ExperienceYears, opt => opt.MapFrom(src => src.ExperienceYears))
+    .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Rating ?? 0))
+    .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => src.Bio ?? string.Empty))
+    .ForMember(dest => dest.Verified, opt => opt.MapFrom(src => src.Verified ?? false))
+    .ForMember(dest => dest.ProfileImage, opt => opt.MapFrom(src => src.ProfileImage))
+    .ForMember(dest => dest.FrontIdcard, opt => opt.MapFrom(src => src.FrontIdcard))
+    .ForMember(dest => dest.BackIdcard, opt => opt.MapFrom(src => src.BackIdcard))
+    .ForMember(dest => dest.WorkerJobTypes, opt => opt.Ignore());
 
             CreateMap<WorkerRate, WorkerRateDto>().ReverseMap(); 
             CreateMap<CreateWorkerRateDto, WorkerRate>().ReverseMap(); 

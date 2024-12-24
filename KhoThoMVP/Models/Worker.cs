@@ -17,6 +17,12 @@ public partial class Worker
 
     public bool? Verified { get; set; }
 
+    public string? ProfileImage { get; set; }
+
+    public string? FrontIdcard { get; set; }
+
+    public string? BackIdcard { get; set; }
+
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();

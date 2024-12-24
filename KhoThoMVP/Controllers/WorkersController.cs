@@ -47,11 +47,25 @@ namespace KhoThoMVP.Controllers
         //}
         [Authorize(Roles = "0, 1")]
         [HttpPost]
-        public async Task<ActionResult<WorkerDto>> CreateWorker(CreateWorkerDto createWorkerDto)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<WorkerDto>> CreateWorker([FromForm] CreateWorkerDto createWorkerDto)
         {
-            var createdWorker = await _workerService.CreateWorkerAsync(createWorkerDto);
-            return CreatedAtAction(nameof(GetWorker), new { id = createdWorker.WorkerId }, createdWorker);
+            try
+            {
+                var result = await _workerService.CreateWorkerAsync(createWorkerDto);
+                return CreatedAtAction(nameof(GetWorker), new { id = result.WorkerId }, result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+        //[HttpPost]
+        //public async Task<ActionResult<WorkerDto>> CreateWorker(CreateWorkerDto createWorkerDto)
+        //{
+        //    var createdWorker = await _workerService.CreateWorkerAsync(createWorkerDto);
+        //    return CreatedAtAction(nameof(GetWorker), new { id = createdWorker.WorkerId }, createdWorker);
+        //}
         [Authorize(Roles = "0, 2")]
         [HttpPut("{id}")]
         public async Task<ActionResult<WorkerDto>> UpdateWorker(int id, WorkerDto workerDto)

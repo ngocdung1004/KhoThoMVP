@@ -103,6 +103,7 @@ namespace KhoThoMVP
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseStaticFiles();
             app.UseCors("AllowAllOrigins");
 
             app.UseHttpsRedirection();

@@ -3,6 +3,7 @@ using KhoThoMVP.DTOs;
 using KhoThoMVP.Interfaces;
 using KhoThoMVP.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace KhoThoMVP.Services
 {
@@ -10,11 +11,13 @@ namespace KhoThoMVP.Services
     {
         private readonly KhoThoContext _context;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _environment;
 
-        public WorkerService(KhoThoContext context, IMapper mapper)
+        public WorkerService(KhoThoContext context, IMapper mapper, IWebHostEnvironment environment)
         {
             _context = context;
             _mapper = mapper;
+            _environment = environment;
         }
 
         public async Task<IEnumerable<WorkerDto>> GetAllWorkersAsync()
@@ -71,44 +74,44 @@ namespace KhoThoMVP.Services
         //    return _mapper.Map<WorkerDto>(worker);
         //}
 
-        public async Task<WorkerDto> CreateWorkerAsync(CreateWorkerDto createWorkerDto)
-        {
-            // Tìm người dùng tương ứng
-            var user = await _context.Users.FindAsync(createWorkerDto.UserId);
-            if (user == null) // Sửa điều kiện này
-            {
-                throw new KeyNotFoundException($"User with ID {createWorkerDto.UserId} not found");
-            }
+        //public async Task<WorkerDto> CreateWorkerAsync(CreateWorkerDto createWorkerDto)
+        //{
+        //    // Tìm người dùng tương ứng
+        //    var user = await _context.Users.FindAsync(createWorkerDto.UserId);
+        //    if (user == null) // Sửa điều kiện này
+        //    {
+        //        throw new KeyNotFoundException($"User with ID {createWorkerDto.UserId} not found");
+        //    }
 
-            // Kiểm tra xem worker đã tồn tại chưa
-            var existingWorker = await _context.Workers.FirstOrDefaultAsync(w => w.UserId == createWorkerDto.UserId);
-            if (existingWorker != null)
-            {
-                throw new InvalidOperationException($"Worker with User ID {createWorkerDto.UserId} already exists.");
-            }
+        //    // Kiểm tra xem worker đã tồn tại chưa
+        //    var existingWorker = await _context.Workers.FirstOrDefaultAsync(w => w.UserId == createWorkerDto.UserId);
+        //    if (existingWorker != null)
+        //    {
+        //        throw new InvalidOperationException($"Worker with User ID {createWorkerDto.UserId} already exists.");
+        //    }
 
-            // Cập nhật UserType của người dùng thành 2
-            user.UserType = 2;
+        //    // Cập nhật UserType của người dùng thành 2
+        //    user.UserType = 2;
 
-            // Tạo worker từ DTO
-            var worker = _mapper.Map<Worker>(createWorkerDto);
-            _context.Workers.Add(worker);
-            await _context.SaveChangesAsync(); // Lưu worker trước để có WorkerId
+        //    // Tạo worker từ DTO
+        //    var worker = _mapper.Map<Worker>(createWorkerDto);
+        //    _context.Workers.Add(worker);
+        //    await _context.SaveChangesAsync(); // Lưu worker trước để có WorkerId
 
-            // Liên kết các loại công việc
-            foreach (var jobTypeId in createWorkerDto.JobTypeIds)
-            {
-                var workerJobType = new WorkerJobType
-                {
-                    WorkerId = worker.WorkerId,
-                    JobTypeId = jobTypeId
-                };
-                _context.WorkerJobTypes.Add(workerJobType);
-            }
-            await _context.SaveChangesAsync(); // Lưu các liên kết loại công việc
+        //    // Liên kết các loại công việc
+        //    foreach (var jobTypeId in createWorkerDto.JobTypeIds)
+        //    {
+        //        var workerJobType = new WorkerJobType
+        //        {
+        //            WorkerId = worker.WorkerId,
+        //            JobTypeId = jobTypeId
+        //        };
+        //        _context.WorkerJobTypes.Add(workerJobType);
+        //    }
+        //    await _context.SaveChangesAsync(); // Lưu các liên kết loại công việc
 
-            return _mapper.Map<WorkerDto>(worker);
-        }
+        //    return _mapper.Map<WorkerDto>(worker);
+        //}
 
 
 
@@ -124,7 +127,98 @@ namespace KhoThoMVP.Services
         //    return _mapper.Map<WorkerDto>(worker);
         //}
 
-        public async Task<WorkerDto> UpdateWorkerAsync(int id, WorkerDto workerDto)
+        private async Task<string> SaveImageAsync(IFormFile file, string folder)
+        {
+            if (file == null || file.Length == 0)
+                return null;
+
+            // Tạo tên file độc nhất
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+            // Tạo đường dẫn đến thư mục lưu trữ
+            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", folder);
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            // Đường dẫn đầy đủ đến file
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            // Lưu file
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+
+            // Trả về đường dẫn tương đối
+            return $"/uploads/{folder}/{fileName}";
+        }
+
+        public async Task<WorkerDto> CreateWorkerAsync(CreateWorkerDto createWorkerDto)
+        {
+            // Kiểm tra user
+            var user = await _context.Users.FindAsync(createWorkerDto.UserId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with ID {createWorkerDto.UserId} not found");
+            }
+
+            // Kiểm tra worker đã tồn tại
+            var existingWorker = await _context.Workers.FirstOrDefaultAsync(w => w.UserId == createWorkerDto.UserId);
+            if (existingWorker != null)
+            {
+                throw new InvalidOperationException($"Worker with User ID {createWorkerDto.UserId} already exists.");
+            }
+
+            // Cập nhật UserType
+            user.UserType = 2;
+
+            // Tạo worker mới
+            var worker = new Worker
+            {
+                UserId = createWorkerDto.UserId,
+                ExperienceYears = createWorkerDto.ExperienceYears,
+                Rating = createWorkerDto.Rating,
+                Bio = createWorkerDto.Bio,
+                Verified = createWorkerDto.Verified
+            };
+
+            // Xử lý upload ảnh
+            if (createWorkerDto.ProfileImage != null)
+            {
+                worker.ProfileImage = await SaveImageAsync(createWorkerDto.ProfileImage, "profile-images");
+            }
+
+            if (createWorkerDto.FrontIdcard != null)
+            {
+                worker.FrontIdcard = await SaveImageAsync(createWorkerDto.FrontIdcard, "id-cards");
+            }
+
+            if (createWorkerDto.BackIdcard != null)
+            {
+                worker.BackIdcard = await SaveImageAsync(createWorkerDto.BackIdcard, "id-cards");
+            }
+
+            _context.Workers.Add(worker);
+            await _context.SaveChangesAsync();
+
+            // Thêm các loại công việc
+            foreach (var jobTypeId in createWorkerDto.JobTypeIds)
+            {
+                var workerJobType = new WorkerJobType
+                {
+                    WorkerId = worker.WorkerId,
+                    JobTypeId = jobTypeId
+                };
+                _context.WorkerJobTypes.Add(workerJobType);
+            }
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<WorkerDto>(worker);
+        }
+    
+
+
+    public async Task<WorkerDto> UpdateWorkerAsync(int id, WorkerDto workerDto)
         {
             var worker = await _context.Workers
                 .Include(w => w.User)  // Include User để tránh mất data khi map
