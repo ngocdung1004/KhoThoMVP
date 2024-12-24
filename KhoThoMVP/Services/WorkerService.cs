@@ -20,13 +20,39 @@ namespace KhoThoMVP.Services
             _environment = environment;
         }
 
+        //public async Task<IEnumerable<WorkerDto>> GetAllWorkersAsync()
+        //{
+        //    var workers = await _context.Workers
+        //        .Include(w => w.User)
+        //        .Where(w => w.User.UserType == 2)
+        //        .ToListAsync();
+        //    return _mapper.Map<IEnumerable<WorkerDto>>(workers);
+        //}
         public async Task<IEnumerable<WorkerDto>> GetAllWorkersAsync()
         {
             var workers = await _context.Workers
                 .Include(w => w.User)
                 .Where(w => w.User.UserType == 2)
                 .ToListAsync();
+
+            // Lấy đường dẫn ảnh profile, mặt trước và mặt sau CCCD
+            foreach (var worker in workers)
+            {
+                worker.ProfileImage = GetImageUrl(worker.ProfileImage);
+                worker.FrontIdcard = GetImageUrl(worker.FrontIdcard);
+                worker.BackIdcard = GetImageUrl(worker.BackIdcard);
+            }
+
             return _mapper.Map<IEnumerable<WorkerDto>>(workers);
+        }
+
+        private string GetImageUrl(string? imagePath)
+        {
+            if (!string.IsNullOrEmpty(imagePath))
+            {
+                return Path.Combine(_environment.WebRootPath, "images", imagePath);
+            }
+            return "default-profile.png"; // Hoặc đường dẫn ảnh mặc định khác
         }
 
         public async Task<WorkerDto> GetWorkerByIdAsync(int id)

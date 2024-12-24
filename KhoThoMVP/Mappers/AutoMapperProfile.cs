@@ -12,7 +12,12 @@ namespace KhoThoMVP.Mappers
             CreateMap<User, UserDto>().ReverseMap();
 
             // Worker mappings
-            CreateMap<Worker, WorkerDto>().ReverseMap();
+            //CreateMap<Worker, WorkerDto>().ReverseMap();
+            CreateMap<Worker, WorkerDto>()
+        .ForMember(dest => dest.ProfileImage, opt => opt.MapFrom(src => src.ProfileImage))
+        .ForMember(dest => dest.FrontIdcard, opt => opt.MapFrom(src => src.FrontIdcard))
+        .ForMember(dest => dest.BackIdcard, opt => opt.MapFrom(src => src.BackIdcard))
+        .ReverseMap();
 
             // JobType mappings
             CreateMap<JobType, JobTypeDto>().ReverseMap();
