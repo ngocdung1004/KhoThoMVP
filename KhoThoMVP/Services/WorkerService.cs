@@ -351,7 +351,10 @@ namespace KhoThoMVP.Services
                     ProfilePicture = worker.User.ProfilePicture,
                     UserType = worker.User.UserType,
                     // Add other user properties as needed
-                }
+                },
+                ProfileImage = worker.ProfileImage,
+                FrontIdcard = worker.FrontIdcard,
+                BackIdcard = worker.BackIdcard
             };
         }
     }
