@@ -1,8 +1,8 @@
 ﻿using KhoThoMVP.DTOs;
 using KhoThoMVP.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KhoThoMVP.Controllers
 {
@@ -16,49 +16,82 @@ namespace KhoThoMVP.Controllers
         {
             _paymentService = paymentService;
         }
+
         [Authorize(Roles = "0")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PaymentDto>>> GetAllPayments()
+        public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPayments()
         {
             var payments = await _paymentService.GetAllPaymentsAsync();
             return Ok(payments);
         }
-        [Authorize(Roles = "0, 1, 2")]
+
+        [Authorize(Roles = "0, 2")]
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentDto>> GetPayment(int id)
         {
-            var payment = await _paymentService.GetPaymentByIdAsync(id);
-            if (payment == null) return NotFound();
-            return Ok(payment);
+            try
+            {
+                var payment = await _paymentService.GetPaymentByIdAsync(id);
+                return Ok(payment);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
-        [Authorize(Roles = "0")]
+
+        [Authorize(Roles = "0, 2")]
         [HttpGet("worker/{workerId}")]
-        public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPaymentsByWorkerId(int workerId)
+        public async Task<ActionResult<IEnumerable<PaymentDto>>> GetPaymentsByWorker(int workerId)
         {
             var payments = await _paymentService.GetPaymentsByWorkerIdAsync(workerId);
             return Ok(payments);
         }
-        [Authorize(Roles = "0, 1, 2")]
+
+        [Authorize(Roles = "0")]
         [HttpPost]
-        public async Task<ActionResult<PaymentDto>> CreatePayment(PaymentDto paymentDto)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<PaymentDto>> CreatePayment([FromForm] CreatePaymentDto createPaymentDto)
         {
-            var payment = await _paymentService.CreatePaymentAsync(paymentDto);
-            return CreatedAtAction(nameof(GetPayment), new { id = payment.PaymentId }, payment);
+            try
+            {
+                var payment = await _paymentService.CreatePaymentAsync(createPaymentDto);
+                return CreatedAtAction(nameof(GetPayment), new { id = payment.PaymentId }, payment);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-        [Authorize(Roles = "0, 1, 2")]
+
+        [Authorize(Roles = "0")]
         [HttpPut("{id}")]
         public async Task<ActionResult<PaymentDto>> UpdatePayment(int id, PaymentDto paymentDto)
         {
-            var payment = await _paymentService.UpdatePaymentAsync(id, paymentDto);
-            if (payment == null) return NotFound();
-            return Ok(payment);
+            try
+            {
+                var updatedPayment = await _paymentService.UpdatePaymentAsync(id, paymentDto);
+                return Ok(updatedPayment);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
+
         [Authorize(Roles = "0")]
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePayment(int id)
+        public async Task<IActionResult> DeletePayment(int id)
         {
-            await _paymentService.DeletePaymentAsync(id);
-            return NoContent();
+            try
+            {
+                await _paymentService.DeletePaymentAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

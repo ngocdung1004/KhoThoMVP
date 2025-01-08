@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\uploads\id-cards\" />
+    <Folder Include="wwwroot\uploads\payments\" />
     <Folder Include="wwwroot\uploads\profile-images\" />
   </ItemGroup>
 

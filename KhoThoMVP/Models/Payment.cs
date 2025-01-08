@@ -17,5 +17,7 @@ public partial class Payment
 
     public DateTime? PaidAt { get; set; }
 
+    public string? PaymentImage { get; set; }
+
     public virtual Worker Worker { get; set; } = null!;
 }
