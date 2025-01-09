@@ -8,10 +8,10 @@ namespace KhoThoMVP.Services
 {
     public class WorkerJobTypeService : IWorkerJobTypeService
     {
-        private readonly KhoThoContext _context;
+        private readonly DungnnExe201Thodung5Context _context;
         private readonly IMapper _mapper;
 
-        public WorkerJobTypeService(KhoThoContext context, IMapper mapper)
+        public WorkerJobTypeService(DungnnExe201Thodung5Context context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

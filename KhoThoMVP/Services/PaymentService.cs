@@ -9,11 +9,11 @@ namespace KhoThoMVP.Services
 {
     public class PaymentService : IPaymentService
     {
-        private readonly KhoThoContext _context;
+        private readonly DungnnExe201Thodung5Context _context;
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _environment;
 
-        public PaymentService(KhoThoContext context, IMapper mapper, IWebHostEnvironment environment)
+        public PaymentService(DungnnExe201Thodung5Context context, IMapper mapper, IWebHostEnvironment environment)
         {
             _context = context;
             _mapper = mapper;

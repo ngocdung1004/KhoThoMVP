@@ -8,10 +8,10 @@ namespace KhoThoMVP.Services
 {
     public class BookingService : IBookingService
     {
-        private readonly KhoThoContext _context;
+        private readonly DungnnExe201Thodung5Context _context;
         private readonly IMapper _mapper;
 
-        public BookingService(KhoThoContext context, IMapper mapper)
+        public BookingService(DungnnExe201Thodung5Context context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

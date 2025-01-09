@@ -8,10 +8,10 @@ namespace KhoThoMVP.Services
 {
     public class SubscriptionService : ISubscriptionService
     {
-        private readonly KhoThoContext _context;
+        private readonly DungnnExe201Thodung5Context _context;
         private readonly IMapper _mapper;
 
-        public SubscriptionService(KhoThoContext context, IMapper mapper)
+        public SubscriptionService(DungnnExe201Thodung5Context context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

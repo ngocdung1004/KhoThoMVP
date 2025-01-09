@@ -57,6 +57,7 @@ public partial class DungnnExe201Thodung5Context : DbContext
 
         return strConn;
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Admin>(entity =>
@@ -143,6 +144,9 @@ public partial class DungnnExe201Thodung5Context : DbContext
             entity.Property(e => e.BookingPaymentId).HasColumnName("BookingPaymentID");
             entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
+            entity.Property(e => e.CommissionRate)
+                .HasDefaultValue(80.00m)
+                .HasColumnType("decimal(5, 2)");
             entity.Property(e => e.PaymentMethod).HasMaxLength(50);
             entity.Property(e => e.PaymentStatus)
                 .HasMaxLength(50)
@@ -150,9 +154,17 @@ public partial class DungnnExe201Thodung5Context : DbContext
             entity.Property(e => e.PaymentTime)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.PlatformAmount)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(10, 2)");
             entity.Property(e => e.TransactionId)
                 .HasMaxLength(255)
                 .HasColumnName("TransactionID");
+            entity.Property(e => e.TransferredToWorker).HasDefaultValue(false);
+            entity.Property(e => e.TransferredToWorkerAt).HasColumnType("datetime");
+            entity.Property(e => e.WorkerAmount)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(10, 2)");
 
             entity.HasOne(d => d.Booking).WithMany(p => p.BookingPayments)
                 .HasForeignKey(d => d.BookingId)

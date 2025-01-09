@@ -8,10 +8,10 @@ namespace KhoThoMVP.Services
 {
     public class UserService : IUserService
     {
-        private readonly KhoThoContext _context;
+        private readonly DungnnExe201Thodung5Context _context;
         private readonly IMapper _mapper;
 
-        public UserService(KhoThoContext context, IMapper mapper)
+        public UserService(DungnnExe201Thodung5Context context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

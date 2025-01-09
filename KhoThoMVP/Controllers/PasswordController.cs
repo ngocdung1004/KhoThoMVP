@@ -14,12 +14,13 @@ namespace KhoThoMVP.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
-        private readonly KhoThoContext _context;
+        private readonly DungnnExe201Thodung5Context
+            _context;
         private readonly ILogger<PasswordController> _logger;
         public PasswordController(
             IConfiguration configuration,
             IEmailService emailService,
-            KhoThoContext context,
+            DungnnExe201Thodung5Context context,
             ILogger<PasswordController> logger)
         {
             _configuration = configuration;

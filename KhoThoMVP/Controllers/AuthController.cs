@@ -14,9 +14,9 @@ namespace KhoThoMVP.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly KhoThoContext _context;
+        private readonly DungnnExe201Thodung5Context _context;
 
-        public AuthController(IConfiguration configuration, KhoThoContext context)
+        public AuthController(IConfiguration configuration, DungnnExe201Thodung5Context context)
         {
             _configuration = configuration;
             _context = context;

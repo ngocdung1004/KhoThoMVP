@@ -19,5 +19,15 @@ public partial class BookingPayment
 
     public DateTime? PaymentTime { get; set; }
 
+    public decimal? WorkerAmount { get; set; }
+
+    public decimal? PlatformAmount { get; set; }
+
+    public decimal? CommissionRate { get; set; }
+
+    public bool? TransferredToWorker { get; set; }
+
+    public DateTime? TransferredToWorkerAt { get; set; }
+
     public virtual Booking Booking { get; set; } = null!;
 }

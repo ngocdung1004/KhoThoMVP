@@ -23,7 +23,7 @@ namespace KhoThoMVP
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddDbContext<KhoThoContext>(options =>
+            builder.Services.AddDbContext<DungnnExe201Thodung5Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
