@@ -40,7 +40,7 @@ namespace KhoThoMVP
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddScoped<IWorkerScheduleService, WorkerScheduleService>();
-
+            builder.Services.AddScoped<IBookingPaymentService, BookingPaymentService>();
 
             // Thêm dịch vụ CORS
             builder.Services.AddCors(options =>
