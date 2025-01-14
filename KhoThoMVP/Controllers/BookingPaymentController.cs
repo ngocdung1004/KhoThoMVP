@@ -54,5 +54,14 @@ namespace KhoThoMVP.Controllers
             if (payment == null) return NotFound();
             return Ok(payment);
         }
+
+        [Authorize(Roles = "0")]
+        [HttpPut("{id}/transferToWorker")]
+        public async Task<ActionResult<BookingPaymentDto>> UpdateTransferredToWorker(int id, [FromBody] bool status)
+        {
+            var payment = await _paymentService.UpdateTransferredToWorker(id, status);
+            if (payment == null) return NotFound();
+            return Ok(payment);
+        }
     }
 }

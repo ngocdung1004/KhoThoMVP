@@ -66,6 +66,21 @@ namespace KhoThoMVP.Services
             await _context.SaveChangesAsync();
             return _mapper.Map<BookingPaymentDto>(payment);
         }
+
+        public async Task<BookingPaymentDto> UpdateTransferredToWorker(int id, bool trans)
+        {
+            var payment = await _context.BookingPayments.FindAsync(id);
+            if (payment == null) return null;
+            payment.TransferredToWorker = trans;
+            if(trans == true)
+            {
+                payment.PaymentTime = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+            return _mapper.Map<BookingPaymentDto>(payment);
+            
+        }
     }
 }
 
