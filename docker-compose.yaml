@@ -1,0 +1,20 @@
+services:
+  khotho-api:
+    build:
+      context: .
+      dockerfile: KhoThoMVP/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=your_connection_string
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - Jwt__Key=your_jwt_key
+      - Jwt__Issuer=your_issuer
+      - Jwt__Audience=your_audience
+      - EmailSettings__SmtpServer=your_email_settings
+      - EmailSettings__SmtpPort=your_email_settings
+      - EmailSettings__SmtpUsername=your_email_settings
+      - EmailSettings__SmtpPassword=your_email_settings
+      - EmailSettings__SenderEmail=your_email_settings
+      - EmailSettings__SenderName=your_email_settings
+    ports:
+      - "8080:80"
